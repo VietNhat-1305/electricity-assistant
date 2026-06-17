@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>⚡ Trợ Lý Tiết Kiệm Điện — Phòng Trọ Sinh Viên</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body>
+
+<!-- ANIMATED BACKGROUND -->
+<div class="bg-scene">
+  <div class="bg-orb bg-orb-1"></div>
+  <div class="bg-orb bg-orb-2"></div>
+  <div class="bg-orb bg-orb-3"></div>
+  <div class="bg-orb bg-orb-4"></div>
+</div>
+<div class="bg-grid"></div>
+
+<div id="app">
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <div class="brand-icon">⚡</div>
+      <span>Tiết Kiệm Điện</span>
+    </div>
+    <div class="navbar-center">
+      <button class="nav-tab-btn active" data-tab="dashboard"><i class="bi bi-speedometer2"></i> Dashboard</button>
+      <button class="nav-tab-btn" data-tab="devices"><i class="bi bi-plug-fill"></i> Thiết bị</button>
+      <button class="nav-tab-btn" data-tab="usage"><i class="bi bi-journal-text"></i> Nhật ký</button>
+      <button class="nav-tab-btn" data-tab="optimize"><i class="bi bi-cpu-fill"></i> Tối ưu DP</button>
+      <button class="nav-tab-btn" data-tab="peak"><i class="bi bi-clock-fill"></i> Lịch sử dụng</button>
+      <button class="nav-tab-btn" data-tab="forecast"><i class="bi bi-graph-up-arrow"></i> Dự báo</button>
+      <button class="nav-tab-btn" data-tab="settings"><i class="bi bi-gear-fill"></i> Cài đặt</button>
+    </div>
+    <div class="navbar-right">
+      <div class="status-badge"><div class="status-dot"></div>Online</div>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="page-wrap">
+    <div class="container-fluid">
+
+      <!-- TAB: DASHBOARD -->
+      <div id="tab-dashboard" class="tab-pane active">
+        <div class="page-header">
+          <h1>📊 Dashboard <span class="gradient-text">Tiêu thụ điện</span></h1>
+          <p>Theo dõi và quản lý điện năng phòng trọ của bạn</p>
+        </div>
+
+        <div class="kpi-grid">
+          <div class="kpi-card blue" id="kpiToday">
+            <div class="kpi-label">Hôm nay</div>
+            <div class="kpi-value">— <span>kWh</span></div>
+            <div class="kpi-sub">Đang tải...</div>
+            <i class="bi bi-lightning-fill kpi-icon"></i>
+          </div>
+          <div class="kpi-card purple" id="kpiAvg">
+            <div class="kpi-label">Trung bình/ngày</div>
+            <div class="kpi-value">— <span>kWh</span></div>
+            <div class="kpi-sub">Đang tải...</div>
+            <i class="bi bi-bar-chart-fill kpi-icon"></i>
+          </div>
+          <div class="kpi-card green" id="kpiMonthly">
+            <div class="kpi-label">Ước tính/tháng</div>
+            <div class="kpi-value">—</div>
+            <div class="kpi-sub">Đang tính...</div>
+            <i class="bi bi-calendar-month-fill kpi-icon"></i>
+          </div>
+          <div class="kpi-card amber" id="kpiDevices">
+            <div class="kpi-label">Thiết bị</div>
+            <div class="kpi-value">—</div>
+            <div class="kpi-sub">Đang tải...</div>
+            <i class="bi bi-plug-fill kpi-icon"></i>
+          </div>
+        </div>
+
+        <div class="glass" style="padding:16px 20px;margin-bottom:20px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <span style="font-size:13px;font-weight:600;color:var(--text-muted)">⚡ Ngân sách hôm nay</span>
+            <span id="budgetDisplay" data-budget="2" style="font-size:13px;font-weight:700;color:#10b981">Đang tính...</span>
+          </div>
+          <div class="progress-bar-wrap" style="height:8px">
+            <div class="progress-bar-fill" id="budgetBarFill" style="width:0%;background:linear-gradient(90deg,#00d4ff,#0088cc)"></div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 340px;gap:16px;margin-bottom:16px">
+          <div class="glass">
+            <div class="card-header">
+              <div class="card-title"><i class="bi bi-graph-up"></i> Tiêu thụ 14 ngày gần nhất</div>
+            </div>
+            <div class="card-body">
+              <div class="chart-wrap" style="height:220px"><canvas id="chartDaily"></canvas></div>
+            </div>
+          </div>
+          <div class="glass">
+            <div class="card-header">
+              <div class="card-title"><i class="bi bi-pie-chart-fill"></i> Theo thiết bị</div>
+            </div>
+            <div class="card-body">
+              <div id="gaugeWrap" style="margin-bottom:12px"></div>
+              <div class="chart-wrap" style="height:150px"><canvas id="chartDonut"></canvas></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div class="glass">
+            <div class="card-header">
+              <div class="card-title"><i class="bi bi-award-fill"></i> Top tiêu thụ</div>
+              <button class="btn btn-ghost btn-sm" onclick="switchTab('usage')"><i class="bi bi-plus"></i> Ghi nhật ký</button>
+            </div>
+            <div class="card-body" id="topDevicesContainer">
+              <div class="empty-state"><i class="bi bi-bar-chart"></i><p>Chưa có dữ liệu</p></div>
+            </div>
+          </div>
+          <div class="glass">
+            <div class="card-header">
+              <div class="card-title"><i class="bi bi-lightbulb-fill"></i> Gợi ý tiết kiệm</div>
+            </div>
+            <div class="card-body" id="tipsContainer">
+              <div class="empty-state"><i class="bi bi-lightbulb"></i><p>Đang phân tích...</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: DEVICES -->
+      <div id="tab-devices" class="tab-pane">
+        <div class="page-header">
+          <h1>🔌 Quản lý <span class="gradient-text">Thiết bị điện</span></h1>
+          <p>Danh sách thiết bị điện trong phòng trọ của bạn</p>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:12px;flex-wrap:wrap">
+          <div class="period-selector" id="deviceFilterBtns"></div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost btn-sm" onclick="resetDevices()"><i class="bi bi-arrow-counterclockwise"></i> Mặc định</button>
+            <button class="btn btn-primary" onclick="openAddDeviceModal()"><i class="bi bi-plus-lg"></i> Thêm thiết bị</button>
+          </div>
+        </div>
+        <div class="devices-grid" id="devicesGrid">
+          <div class="empty-state" style="grid-column:1/-1"><span class="spinner"></span></div>
+        </div>
+        <div class="glass" style="margin-top:16px">
+          <div class="card-header">
+            <div class="card-title"><i class="bi bi-pie-chart"></i> Phân tích theo danh mục</div>
+          </div>
+          <div class="card-body">
+            <div class="chart-wrap" style="height:240px"><canvas id="chartCategory"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: USAGE -->
+      <div id="tab-usage" class="tab-pane">
+        <div class="page-header">
+          <h1>📓 Nhật ký <span class="gradient-text">Sử dụng điện</span></h1>
+          <p>Ghi lại số giờ sử dụng từng thiết bị theo ngày</p>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 340px;gap:16px">
+          <div>
+            <div class="glass" style="margin-bottom:16px">
+              <div class="card-header">
+                <div class="card-title"><i class="bi bi-calendar-day-fill"></i> Ghi ngày</div>
+                <div style="display:flex;align-items:center;gap:10px">
+                  <input type="date" id="usageDateInput" class="form-input" style="width:160px">
+                  <button class="btn btn-primary" onclick="saveAllUsage()"><i class="bi bi-floppy2-fill"></i> Lưu</button>
+                </div>
+              </div>
+              <div class="card-body">
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:rgba(0,212,255,0.05);border:1px solid rgba(0,212,255,0.15);border-radius:10px;margin-bottom:14px">
+                  <span style="font-size:13px;color:var(--text-muted)">Tổng hôm nay:</span>
+                  <div>
+                    <span id="usageTotalKwh" style="font-size:16px;font-weight:800;color:#10b981">0.000 kWh</span>
+                    <span id="usagePct" style="font-size:12px;color:var(--text-muted);margin-left:8px">0% ngân sách</span>
+                  </div>
+                </div>
+                <div id="usageFormRows"><div class="empty-state"><span class="spinner"></span></div></div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="glass">
+              <div class="card-header">
+                <div class="card-title"><i class="bi bi-grid-3x3-gap-fill"></i> Heatmap 30 ngày</div>
+              </div>
+              <div class="card-body">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+                  <div class="legend-item"><div class="legend-dot" style="background:rgba(255,255,255,0.06)"></div> 0 kWh</div>
+                  <div class="legend-item"><div class="legend-dot" style="background:#10b981"></div> Thấp</div>
+                  <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div> TB</div>
+                  <div class="legend-item"><div class="legend-dot" style="background:#ef4444"></div> Cao</div>
+                </div>
+                <div class="heatmap-grid" id="heatmapGrid"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="glass" style="margin-top:16px">
+          <div class="card-header">
+            <div class="card-title"><i class="bi bi-clock-history"></i> Lịch sử 14 ngày</div>
+            <button class="btn btn-ghost btn-sm" onclick="renderUsageHistory()"><i class="bi bi-arrow-clockwise"></i> Làm mới</button>
+          </div>
+          <div class="card-body table-wrap" id="usageHistoryTable">
+            <div class="empty-state"><span class="spinner"></span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: OPTIMIZE -->
+      <div id="tab-optimize" class="tab-pane">
+        <div class="page-header">
+          <h1>🧮 Tối ưu <span class="gradient-text">DP vs Greedy</span></h1>
+          <p>So sánh thuật toán Quy hoạch động Group Knapsack và Greedy</p>
+        </div>
+
+        <div class="glass" style="margin-bottom:16px">
+          <div class="card-header">
+            <div class="card-title"><i class="bi bi-book-fill"></i> Giải thích thuật toán</div>
+            <button class="btn btn-ghost btn-sm" id="btnToggleAlgo" onclick="toggleAlgoExplain()">
+              <i class="bi bi-chevron-down"></i> Xem chi tiết
+            </button>
+          </div>
+          <div id="algoExplain" style="display:none">
+            <div class="card-body">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+                <div>
+                  <div style="font-size:13px;font-weight:700;color:#00d4ff;margin-bottom:12px">📌 Bài toán Group Knapsack</div>
+                  <div class="algo-step">
+                    <div class="algo-step-num">1</div>
+                    <div class="algo-step-content">
+                      <div class="algo-step-title">Input</div>
+                      <div class="algo-step-text">n thiết bị, mỗi cái có <strong>công suất (W)</strong>, <strong>độ ưu tiên</strong>, <strong>giờ tối đa/ngày</strong>. Ngân sách W kWh.</div>
+                    </div>
+                  </div>
+                  <div class="algo-step">
+                    <div class="algo-step-num">2</div>
+                    <div class="algo-step-content">
+                      <div class="algo-step-title">Lựa chọn</div>
+                      <div class="algo-step-text">Với mỗi thiết bị i, chọn h ∈ {0, 0.5, 1.0, …, max_h}:</div>
+                      <div class="formula-box">cost(i,h) = power_w × h / 1000  (kWh)
+val(i,h)  = priority × h          (điểm)</div>
+                    </div>
+                  </div>
+                  <div class="algo-step">
+                    <div class="algo-step-num">3</div>
+                    <div class="algo-step-content">
+                      <div class="algo-step-title">Mục tiêu</div>
+                      <div class="algo-step-text">Tối đa hóa Σ val(i, h_i) sao cho Σ cost(i, h_i) ≤ W</div>
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <div style="font-size:13px;font-weight:700;color:#a78bfa;margin-bottom:12px">⚙️ Chuyển trạng thái DP</div>
+                  <div class="formula-box" style="color:#a78bfa;border-color:rgba(124,58,237,0.3);background:rgba(124,58,237,0.05)">dp[i+1][j] = max(
+  dp[i][j],                    ← không dùng
+  dp[i][j - cost_u] + val      ← dùng h giờ
+)
+choice[i][j] = số giờ đã chọn</div>
+                  <div style="margin-top:12px">
+                    <div style="font-size:13px;font-weight:700;color:#10b981;margin-bottom:8px">📊 Độ phức tạp</div>
+                    <div class="formula-box" style="color:#10b981;border-color:rgba(16,185,129,0.3);background:rgba(16,185,129,0.05)">DP:     O(n × W/δ × H/Δ) — tối ưu toàn cục
+Greedy: O(n log n)        — xấp xỉ, nhanh hơn
+δ = 0.01 kWh | Δ = 0.5h</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass" style="margin-bottom:16px">
+          <div class="card-body" style="padding:20px">
+            <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+              <div style="flex:1;min-width:200px">
+                <label class="form-label">Ngân sách điện / ngày</label>
+                <input type="range" class="range-slider" id="optimizeBudget" min="0.5" max="10" step="0.1" value="2">
+              </div>
+              <div style="text-align:center;min-width:80px">
+                <div style="font-size:24px;font-weight:800;color:#00d4ff" id="optimizeBudgetDisplay">2.0 kWh</div>
+              </div>
+              <button class="btn btn-primary btn-lg" id="btnOptimize" onclick="runOptimize()">
+                <i class="bi bi-lightning-fill"></i> Chạy tối ưu
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="optimizeSummary" style="margin-bottom:16px"></div>
+
+        <div class="compare-grid" style="margin-bottom:16px">
+          <div class="algo-panel glass" id="dpPanel">
+            <div class="algo-header dp">
+              <div><div class="algo-title">🧮 DP — Group Knapsack</div><div class="algo-complexity">Nhấn "Chạy tối ưu" để xem kết quả</div></div>
+              <div class="algo-score" style="color:#00d4ff">—</div>
+            </div>
+            <div class="algo-body"><div class="empty-state" style="padding:30px"><i class="bi bi-cpu"></i><p>Chưa chạy</p></div></div>
+          </div>
+          <div class="algo-panel glass" id="greedyPanel">
+            <div class="algo-header greedy">
+              <div><div class="algo-title">⚡ Greedy — Ưu tiên/Công suất</div><div class="algo-complexity">Nhấn "Chạy tối ưu" để xem kết quả</div></div>
+              <div class="algo-score" style="color:#a78bfa">—</div>
+            </div>
+            <div class="algo-body"><div class="empty-state" style="padding:30px"><i class="bi bi-lightning"></i><p>Chưa chạy</p></div></div>
+          </div>
+        </div>
+
+        <div class="glass" style="margin-bottom:16px">
+          <div class="card-header">
+            <div class="card-title"><i class="bi bi-bar-chart-fill"></i> So sánh điểm thoải mái từng thiết bị</div>
+          </div>
+          <div class="card-body">
+            <div class="chart-wrap" style="height:250px"><canvas id="chartOptimize"></canvas></div>
+          </div>
+        </div>
+
+        <div class="counterex-box" id="counterexampleBox">
+          <div class="counterex-title"><i class="bi bi-exclamation-triangle-fill"></i> Phản ví dụ — Tại sao Greedy không luôn tối ưu</div>
+          <p style="color:var(--text-muted);font-size:13px">Chạy tối ưu để xem phản ví dụ minh họa</p>
+        </div>
+      </div>
+
+      <!-- TAB: PEAK -->
+      <div id="tab-peak" class="tab-pane">
+        <div class="page-header">
+          <h1>⏰ Lịch sử dụng <span class="gradient-text">tránh giờ cao điểm</span></h1>
+          <p>Phân bổ thiết bị sang giờ thấp điểm để tiết kiệm chi phí</p>
+        </div>
+
+        <div style="padding:14px 18px;background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.2);border-radius:12px;margin-bottom:16px;display:flex;align-items:center;gap:12px">
+          <span style="font-size:22px">⚠️</span>
+          <div>
+            <div style="font-size:13px;font-weight:600;color:#f87171">Giờ cao điểm EVN: 9h–11h30 và 17h–20h</div>
+            <div style="font-size:12px;color:var(--text-muted)">Thiết bị công suất ≥500W sẽ được tự động ưu tiên sang giờ thấp điểm</div>
+          </div>
+        </div>
+
+        <div class="glass" style="margin-bottom:16px">
+          <div class="card-body">
+            <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+              <div style="flex:1;min-width:200px">
+                <label class="form-label">Ngân sách</label>
+                <input type="range" class="range-slider" id="peakBudget" min="0.5" max="10" step="0.1" value="2">
+              </div>
+              <div style="text-align:center;min-width:70px">
+                <div style="font-size:22px;font-weight:800;color:#00d4ff" id="peakBudgetDisplay">2.0 kWh</div>
+              </div>
+              <button class="btn btn-primary" id="btnPeak" onclick="runPeakSchedule()">
+                <i class="bi bi-clock-fill"></i> Tạo lịch
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass" style="margin-bottom:16px">
+          <div class="card-header">
+            <div class="card-title"><i class="bi bi-grid-1x2-fill"></i> Biểu đồ 24 giờ</div>
+            <div style="display:flex;gap:12px">
+              <div class="legend-item"><div class="legend-dot" style="background:rgba(16,185,129,0.6)"></div>Thấp điểm</div>
+              <div class="legend-item"><div class="legend-dot" style="background:rgba(239,68,68,0.6)"></div>Cao điểm</div>
+              <div class="legend-item"><div class="legend-dot" style="background:rgba(0,212,255,0.6)"></div>Thiết bị bật</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="timeline-grid" id="peakTimeline">
+              <div style="grid-column:1/-1;padding:20px;text-align:center;color:var(--text-muted);font-size:13px">Nhấn "Tạo lịch" để xem</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass">
+          <div class="card-header">
+            <div class="card-title"><i class="bi bi-list-check"></i> Lịch từng thiết bị</div>
+          </div>
+          <div class="card-body" id="peakDeviceList">
+            <div class="empty-state"><i class="bi bi-clock"></i><p>Chưa tạo lịch</p></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: FORECAST -->
+      <div id="tab-forecast" class="tab-pane">
+        <div class="page-header">
+          <h1>📈 Dự báo <span class="gradient-text">chi phí điện</span></h1>
+          <p>Ước tính hóa đơn EVN các tháng tới dựa trên nhật ký</p>
+        </div>
+        <div id="forecastSummary" style="margin-bottom:16px">
+          <div class="empty-state"><span class="spinner"></span></div>
+        </div>
+        <div class="glass" style="margin-bottom:16px">
+          <div class="card-header">
+            <div class="card-title"><i class="bi bi-arrow-left-right"></i> So sánh: Hiện tại vs Tối ưu DP</div>
+          </div>
+          <div class="card-body" id="forecastOptimized">
+            <div class="empty-state"><i class="bi bi-graph-up-arrow"></i><p>Đang tính toán...</p></div>
+          </div>
+        </div>
+        <div class="glass">
+          <div class="card-header">
+            <div class="card-title"><i class="bi bi-graph-up"></i> Xu hướng 6 tháng tới</div>
+          </div>
+          <div class="card-body">
+            <div class="chart-wrap" style="height:260px"><canvas id="chartForecast"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: SETTINGS -->
+      <div id="tab-settings" class="tab-pane">
+        <div class="page-header">
+          <h1>⚙️ <span class="gradient-text">Cài đặt</span></h1>
+          <p>Tùy chỉnh ngân sách, giờ cao điểm và giá điện</p>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div class="glass">
+            <div class="card-header">
+              <div class="card-title"><i class="bi bi-sliders"></i> Thông số</div>
+            </div>
+            <div class="card-body">
+              <form id="settingsForm">
+                <div class="form-group">
+                  <label class="form-label">Ngân sách điện / ngày (kWh)</label>
+                  <input type="number" id="cfgBudget" class="form-input" step="0.1" min="0.1" max="20" value="2.0" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Giá điện trung bình (₫/kWh)</label>
+                  <input type="number" id="cfgRate" class="form-input" step="100" min="100" max="10000" value="3500" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Giờ cao điểm (cách nhau bằng dấu phẩy)</label>
+                  <input type="text" id="cfgPeakHours" class="form-input" value="17, 18, 19, 20, 21">
+                </div>
+                <button type="submit" class="btn btn-primary w-100"><i class="bi bi-floppy2-fill"></i> Lưu cài đặt</button>
+              </form>
+            </div>
+          </div>
+          <div>
+            <div class="glass" style="margin-bottom:16px">
+              <div class="card-header">
+                <div class="card-title"><i class="bi bi-calculator-fill"></i> Tính tiền điện EVN</div>
+              </div>
+              <div class="card-body">
+                <div class="form-group">
+                  <label class="form-label">Điện năng tiêu thụ (kWh/tháng)</label>
+                  <div style="display:flex;gap:8px">
+                    <input type="number" id="evnKwh" class="form-input" step="1" min="0" max="2000" placeholder="VD: 150">
+                    <button class="btn btn-secondary" onclick="calcEvnPreview()"><i class="bi bi-calculator"></i> Tính</button>
+                  </div>
+                </div>
+                <div id="evnResult">
+                  <div class="empty-state" style="padding:20px"><i class="bi bi-calculator"></i><p>Nhập kWh và nhấn Tính</p></div>
+                </div>
+              </div>
+            </div>
+            <div class="glass">
+              <div class="card-header">
+                <div class="card-title"><i class="bi bi-bar-chart"></i> Biểu đồ bậc giá</div>
+              </div>
+              <div class="card-body">
+                <div class="chart-wrap" style="height:180px"><canvas id="chartEvn"></canvas></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass" style="margin-top:16px">
+          <div class="card-header">
+            <div class="card-title"><i class="bi bi-table"></i> Biểu giá điện EVN 2024 (6 bậc)</div>
+          </div>
+          <div class="card-body table-wrap">
+            <table class="data-table">
+              <thead><tr><th>Bậc</th><th>Mức tiêu thụ</th><th>Đơn giá</th><th>Ví dụ 50 kWh</th></tr></thead>
+              <tbody>
+                <tr><td><span class="badge badge-green">1</span></td><td>0 – 50 kWh</td><td style="color:#10b981;font-weight:700">1.806 ₫/kWh</td><td>90.300 ₫</td></tr>
+                <tr><td><span class="badge badge-green">2</span></td><td>51 – 100 kWh</td><td style="color:#34d399;font-weight:700">1.866 ₫/kWh</td><td>93.300 ₫</td></tr>
+                <tr><td><span class="badge badge-amber">3</span></td><td>101 – 200 kWh</td><td style="color:#f59e0b;font-weight:700">2.167 ₫/kWh</td><td>108.350 ₫</td></tr>
+                <tr><td><span class="badge badge-amber">4</span></td><td>201 – 300 kWh</td><td style="color:#fb923c;font-weight:700">2.729 ₫/kWh</td><td>136.450 ₫</td></tr>
+                <tr><td><span class="badge badge-red">5</span></td><td>301 – 400 kWh</td><td style="color:#ef4444;font-weight:700">3.050 ₫/kWh</td><td>152.500 ₫</td></tr>
+                <tr><td><span class="badge badge-red">6</span></td><td>Trên 400 kWh</td><td style="color:#dc2626;font-weight:700">3.151 ₫/kWh</td><td>157.550 ₫</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- MODAL: ADD DEVICE -->
+<div id="addDeviceModal" class="modal-backdrop">
+  <div class="modal-box">
+    <div class="modal-title"><i class="bi bi-plug-fill"></i> Thêm thiết bị mới</div>
+    <form id="addDeviceForm">
+      <div class="form-group">
+        <label class="form-label">ID (viết thường, không dấu, không dấu cách)</label>
+        <input type="text" name="devId" class="form-input" placeholder="vd: may_loc_nuoc" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tên thiết bị</label>
+        <input type="text" name="devName" class="form-input" placeholder="vd: Máy lọc nước" required>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="form-group">
+          <label class="form-label">Công suất (Watt)</label>
+          <input type="number" name="devPower" class="form-input" min="1" max="10000" placeholder="200" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Giờ tối đa/ngày</label>
+          <input type="number" name="devHours" class="form-input" step="0.5" min="0.5" max="24" placeholder="8" required>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="form-group">
+          <label class="form-label">Ưu tiên (1–5)</label>
+          <select name="devPriority" class="form-select" required>
+            <option value="5">5 — Rất cần</option>
+            <option value="4">4 — Cần</option>
+            <option value="3" selected>3 — Bình thường</option>
+            <option value="2">2 — Ít cần</option>
+            <option value="1">1 — Tùy chọn</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Danh mục</label>
+          <select name="devCategory" class="form-select" required>
+            <option value="cooling">❄️ Làm mát</option>
+            <option value="lighting">💡 Chiếu sáng</option>
+            <option value="computing">💻 Máy tính</option>
+            <option value="heating">🔥 Nhiệt</option>
+            <option value="entertainment">📺 Giải trí</option>
+            <option value="cooking">🍚 Nấu ăn</option>
+            <option value="cleaning">🌊 Vệ sinh</option>
+            <option value="other">🔌 Khác</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:6px">
+        <button type="button" class="btn btn-ghost w-100" onclick="closeAddDeviceModal()">Hủy</button>
+        <button type="submit" class="btn btn-primary w-100"><i class="bi bi-plus-lg"></i> Thêm</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="toastContainer" class="toast-container"></div>
+
+<script src="/static/js/api.js"></script>
+<script src="/static/js/charts.js"></script>
+<script src="/static/js/extras.js"></script>
+<script src="/static/js/main.js"></script>
+<script>
+function toggleAlgoExplain() {
+  const el = document.getElementById('algoExplain');
+  const btn = document.getElementById('btnToggleAlgo');
+  if (el.style.display === 'none') {
+    el.style.display = '';
+    btn.innerHTML = '<i class="bi bi-chevron-up"></i> Ẩn';
+  } else {
+    el.style.display = 'none';
+    btn.innerHTML = '<i class="bi bi-chevron-down"></i> Xem chi tiết';
+  }
+}
+</script>
+</body>
+</html>
