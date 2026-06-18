@@ -164,6 +164,9 @@ app = Flask(__name__)
 @app.route("/")
 def index(): return render_template("index.html")
 
+@app.route("/flowchart")
+def flowchart(): return render_template("flowchart.html")
+
 # ── Devices ───────────────────────────────────────────────────
 @app.route("/api/devices")
 def r_devices(): return jsonify([d.to_dict() for d in load_devices()])

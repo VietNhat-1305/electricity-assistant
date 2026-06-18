@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flowchart — Tro Ly Tiet Kiem Dien</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.0/dist/mermaid.min.js"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#030d1f;color:#cbd5e1;font-family:'Segoe UI',sans-serif;min-height:100vh;padding:32px 24px 80px}
+    h1{text-align:center;font-size:24px;font-weight:800;margin-bottom:6px;background:linear-gradient(90deg,#00d4ff,#a78bfa,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .subtitle{text-align:center;color:#64748b;font-size:13px;margin-bottom:40px}
+    .section{max-width:1000px;margin:0 auto 52px}
+    .section-title{font-size:15px;font-weight:700;margin-bottom:14px;padding:9px 16px;border-radius:9px;display:inline-flex;align-items:center;gap:8px}
+    .blue  {background:rgba(0,212,255,.1); border:1px solid rgba(0,212,255,.3); color:#00d4ff}
+    .purple{background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.3);color:#a78bfa}
+    .green {background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);color:#10b981}
+    .amber {background:rgba(245,158,11,.1); border:1px solid rgba(245,158,11,.3); color:#f59e0b}
+    .chart-box{background:rgba(5,20,50,.75);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:24px;overflow-x:auto}
+    .mermaid{display:flex;justify-content:center}
+    .back-btn{position:fixed;bottom:24px;right:24px;background:linear-gradient(135deg,#00d4ff,#7c3aed);color:#fff;border:none;border-radius:12px;padding:11px 20px;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;box-shadow:0 4px 20px rgba(0,212,255,.3)}
+  </style>
+</head>
+<body>
+
+<h1>Flowchart — Tro Ly Tiet Kiem Dien</h1>
+<p class="subtitle">So do luong hoat dong he thong va cac thuat toan</p>
+
+<!-- 1. TONG QUAN -->
+<div class="section">
+  <div class="section-title blue">① Luong hoat dong tong quan he thong</div>
+  <div class="chart-box">
+    <div class="mermaid">
+flowchart TD
+    A([Nguoi dung\nmo trinh duyet]) --> B[Giao dien Web\nindex.html]
+    B --> C{Chon\nchuc nang}
+    C --> D[Dashboard]
+    C --> E[Thiet bi]
+    C --> F[Nhat ky]
+    C --> G[Toi uu DP]
+    C --> H[Lich cao diem]
+    C --> I[Du bao]
+    D --> J[GET /api/stats]
+    E --> K[GET /api/devices]
+    F --> L[POST /api/usage]
+    G --> M[POST /api/optimize]
+    H --> N[POST /api/peak]
+    I --> O[GET /api/forecast]
+    J --> P[(Flask Server\nweb_app.py)]
+    K --> P
+    L --> P
+    M --> P
+    N --> P
+    O --> P
+    P --> Q[(File JSON\ndata/)]
+    Q --> P
+    P --> R[JSON Response]
+    R --> S[JavaScript xu ly]
+    S --> T[Giao dien cap nhat]
+
+    style A fill:#1e3a5f,stroke:#00d4ff,color:#fff
+    style P fill:#2d1b69,stroke:#7c3aed,color:#fff
+    style Q fill:#1a3a2a,stroke:#10b981,color:#fff
+    style T fill:#1e3a5f,stroke:#00d4ff,color:#fff
+    </div>
+  </div>
+</div>
+
+<!-- 2. THUAT TOAN DP -->
+<div class="section">
+  <div class="section-title purple">② Thuat toan DP — Group Knapsack</div>
+  <div class="chart-box">
+    <div class="mermaid">
+flowchart TD
+    A([Bat dau\ndp_optimize]) --> B["Nhan vao:\ndanh sach thiet bi\nNgan sach W kWh"]
+    B --> C["Tinh so o ngan sach:\nW = int(budget / 0.01) + 1\nVD 2.0kWh → W=201 o"]
+    C --> D["Khoi tao bang DP:\ndp[n+1][W] = 0\nchoice[n][W] = 0"]
+    D --> E["Vong lap ngoai\ni tu 0 den n-1\nduyet tung thiet bi"]
+    E --> F["Sinh lua chon cho thiet bi i\nh = 0.5, 1.0, ..., max_h\ncost_u = kwh / 0.01"]
+    F --> G["Vong lap trong\nj tu 0 den W-1\nduyet tung muc ngan sach"]
+    G --> H["Mac dinh: dp[i+1][j] = dp[i][j]\nkhong dung thiet bi i"]
+    H --> I{Thu tung\nlua chon h gio}
+    I --> J{j >= cost_u?\nDu ngan sach?}
+    J -->|Khong| K[Bo qua\nlua chon nay]
+    J -->|Co| L["candidate = dp[i][j - cost_u] + val\ndiem cu cong diem them"]
+    L --> M{candidate\n> dp[i+1][j]?}
+    M -->|Khong| N[Giu nguyen]
+    M -->|Co| O["dp[i+1][j] = candidate\nchoice[i][j] = h\nghi nho quyet dinh"]
+    K --> P{Con lua\nchon nao?}
+    N --> P
+    O --> P
+    P -->|Co| I
+    P -->|Het| Q{Con thiet\nbi nao?}
+    Q -->|Co| E
+    Q -->|Het| R["Tim best_j = argmax dp[n][j]\nlay o cho diem cao nhat"]
+    R --> S["Truy vet nguoc\nj = best_j\ni tu n-1 ve 0"]
+    S --> T{choice[i][j] > 0?}
+    T -->|Co| U["Them vao lich:\nthiet bi i, so gio h\nj -= cost_u"]
+    T -->|Khong| V[Thiet bi i\nkhong duoc dung]
+    U --> W{Con thiet\nbi nao?}
+    V --> W
+    W -->|Co| S
+    W -->|Het| X([Ket qua\nLich toi uu toan cuc])
+
+    style A fill:#1e3a5f,stroke:#00d4ff,color:#fff
+    style X fill:#1a3a2a,stroke:#10b981,color:#fff
+    style O fill:#2d1b69,stroke:#7c3aed,color:#fff
+    style D fill:#1e3a5f,stroke:#00d4ff,color:#fff
+    </div>
+  </div>
+</div>
+
+<!-- 3. GREEDY -->
+<div class="section">
+  <div class="section-title green">③ Thuat toan Greedy — Uu tien / Cong suat</div>
+  <div class="chart-box">
+    <div class="mermaid">
+flowchart TD
+    A([Bat dau\ngreedy_optimize]) --> B["Nhan vao:\ndanh sach thiet bi\nNgan sach W kWh"]
+    B --> C["Tinh ty le hieu qua\nratio = priority / power_w"]
+    C --> D["Vi du:\nDen LED  15W pri=5 ratio=0.333\nQuat     55W pri=5 ratio=0.091\nDieu hoa 900W pri=4 ratio=0.004"]
+    D --> E["Sap xep giam dan theo ratio\nO(n log n)"]
+    E --> F["remaining = budget_kwh\nlich = rong"]
+    F --> G{Con thiet bi\nchua xet?}
+    G -->|Khong| END([Ket qua\nLich xap xi])
+    G -->|Co| H[Lay thiet bi tiep theo\ntheo thu tu da sap]
+    H --> I{remaining > 0?}
+    I -->|Khong| END
+    I -->|Co| J["hours_max = remaining / (power_w/1000)\nhours = min(max_daily, hours_max)"]
+    J --> K["Lam tron xuong:\nhours = floor(hours/0.5) x 0.5\ntranh vuot ngan sach"]
+    K --> L{hours >= 0.5h?}
+    L -->|Khong| M[Bo qua\nthiet bi nay]
+    L -->|Co| N["Them vao lich\nremaining -= kwh(hours)"]
+    M --> G
+    N --> G
+
+    style A fill:#1e3a5f,stroke:#00d4ff,color:#fff
+    style END fill:#1a3a2a,stroke:#10b981,color:#fff
+    style E fill:#2d1b69,stroke:#7c3aed,color:#fff
+    style D fill:#3a2a0a,stroke:#f59e0b,color:#fff
+    </div>
+  </div>
+</div>
+
+<!-- 4. PHAN VI DU -->
+<div class="section">
+  <div class="section-title amber">④ Phan vi du — Tai sao Greedy thua DP</div>
+  <div class="chart-box">
+    <div class="mermaid">
+flowchart LR
+    subgraph INPUT["Input: Budget = 0.30 kWh"]
+        A["Loa Bluetooth\n200W - priority=3\ncost=0.20kWh\nratio=0.015"]
+        B["Dieu hoa nho\n300W - priority=4\ncost=0.30kWh\nratio=0.013"]
+    end
+
+    subgraph GREEDY["Greedy"]
+        direction TB
+        G1["Sap xep: Loa ratio 0.015\ncao hon Dieu hoa 0.013"]
+        G2["Buoc 1: Chon Loa\ndung 0.20kWh - con 0.10kWh\nDat 3 diem"]
+        G3{Dieu hoa can\n0.30kWh\nma chi con 0.10kWh}
+        G4["Bo qua Dieu hoa"]
+        G5["KET QUA: 3 diem"]
+        G1 --> G2 --> G3 -->|Khong du| G4 --> G5
+    end
+
+    subgraph DP["DP"]
+        direction TB
+        D1["Xet Loa: dp[1][j]"]
+        D2["Xet Dieu hoa: dp[2][30]"]
+        D3["max(3 diem, 0+4 diem) = 4"]
+        D4["Chon Dieu hoa 1h"]
+        D5["KET QUA: 4 diem"]
+        D1 --> D2 --> D3 --> D4 --> D5
+    end
+
+    INPUT --> GREEDY
+    INPUT --> DP
+    G5 --> R["DP THANG\n4 diem vs 3 diem\nDP toi uu toan cuc\nGreedy tham lam cuc bo"]
+    D5 --> R
+
+    style G5 fill:#3a1a1a,stroke:#ef4444,color:#f87171
+    style D5 fill:#1a3a2a,stroke:#10b981,color:#4ade80
+    style R fill:#2d1b69,stroke:#7c3aed,color:#a78bfa
+    style INPUT fill:#1e3a5f,stroke:#00d4ff,color:#cbd5e1
+    </div>
+  </div>
+</div>
+
+<!-- 5. LUONG DU LIEU -->
+<div class="section">
+  <div class="section-title blue">⑤ Luong du lieu — tu nhap lieu den ket qua</div>
+  <div class="chart-box">
+    <div class="mermaid">
+flowchart LR
+    subgraph USER["Nguoi dung"]
+        U1[Keo slider\nngan sach]
+        U2[Nhap gio\nsu dung]
+        U3[Xem ket qua\nva bieu do]
+    end
+    subgraph FRONTEND["Frontend JS"]
+        F1["api.js\nfetch POST /api/optimize"]
+        F2["main.js\nrunOptimize()"]
+        F3["charts.js\nve bieu do"]
+    end
+    subgraph BACKEND["Flask Backend"]
+        B1["web_app.py\nr_optimize()"]
+        B2["dp_optimize()\nO(n x W x H)"]
+        B3["greedy_optimize()\nO(n log n)"]
+        B4["calc_evn()\n6 bac gia"]
+    end
+    subgraph STORAGE["Luu tru"]
+        S1["devices.json"]
+        S2["usage.json"]
+        S3["config.json"]
+    end
+    U1 --> F2
+    U2 --> F1
+    F2 --> F1
+    F1 --> B1
+    B1 --> S1
+    S1 --> B1
+    B1 --> B2
+    B1 --> B3
+    B2 --> B4
+    B3 --> B4
+    B4 --> B1
+    B1 --> F1
+    F1 --> F3
+    F3 --> U3
+
+    style USER fill:#1e3a5f,stroke:#00d4ff,color:#cbd5e1
+    style FRONTEND fill:#2d1b69,stroke:#7c3aed,color:#cbd5e1
+    style BACKEND fill:#1a3a2a,stroke:#10b981,color:#cbd5e1
+    style STORAGE fill:#3a2a0a,stroke:#f59e0b,color:#cbd5e1
+    </div>
+  </div>
+</div>
+
+<!-- 6. EVN -->
+<div class="section">
+  <div class="section-title green">⑥ Tinh tien dien EVN — 6 bac luy tien</div>
+  <div class="chart-box">
+    <div class="mermaid">
+flowchart TD
+    A([Bat dau\ncalc_evn X kWh]) --> B["cost = 0\nrem = X"]
+    B --> D["Bac 1: min(rem, 50) kWh\nx 1806 dong/kWh"]
+    D --> E{rem > 50?}
+    E -->|Khong| Z
+    E -->|Co| F["Bac 2: min(rem, 50) kWh\nx 1866 dong/kWh"]
+    F --> G{rem > 100?}
+    G -->|Khong| Z
+    G -->|Co| H["Bac 3: min(rem, 100) kWh\nx 2167 dong/kWh"]
+    H --> I{rem > 200?}
+    I -->|Khong| Z
+    I -->|Co| J["Bac 4: min(rem, 100) kWh\nx 2729 dong/kWh"]
+    J --> K{rem > 300?}
+    K -->|Khong| Z
+    K -->|Co| L["Bac 5: min(rem, 100) kWh\nx 3050 dong/kWh"]
+    L --> M{rem > 400?}
+    M -->|Khong| Z
+    M -->|Co| N["Bac 6: phan con lai\nx 3151 dong/kWh"]
+    N --> Z([Tra ve tong tien dong])
+
+    style A fill:#1e3a5f,stroke:#00d4ff,color:#fff
+    style Z fill:#3a2a0a,stroke:#f59e0b,color:#fbbf24
+    style D fill:#1a3a2a,stroke:#10b981,color:#fff
+    style F fill:#1a3a2a,stroke:#10b981,color:#fff
+    style H fill:#3a2a0a,stroke:#f59e0b,color:#fff
+    style J fill:#3a2a0a,stroke:#f59e0b,color:#fff
+    style L fill:#3a1a1a,stroke:#ef4444,color:#fff
+    style N fill:#3a1a1a,stroke:#ef4444,color:#fff
+    </div>
+  </div>
+</div>
+
+<!-- 7. LICH CAO DIEM -->
+<div class="section">
+  <div class="section-title amber">⑦ Heuristic — Phan bo lich tranh gio cao diem</div>
+  <div class="chart-box">
+    <div class="mermaid">
+flowchart TD
+    A([Bat dau\npeak_aware_schedule]) --> B["Lay ket qua tu DP\ndanh sach thiet bi toi uu"]
+    B --> C["Xac dinh gio thap diem\n= 24 gio tru gio cao diem"]
+    C --> D{Duyet tung\nthiet bi trong lich}
+    D --> E{power_w >= 500W?\nThiet bi ton dien?}
+    E -->|Co| F["Pool = gio thap diem TRUOC\nVD binh nuoc nong 2000W\nuu tien 0h-16h, 21h-23h"]
+    E -->|Khong| G["Pool = thap diem + cao diem\nVD den LED 15W\nlinh hoat bat ky gio nao"]
+    F --> H["Phan bo hours vao\ncac slot theo pool\nmoi slot toi da 1h"]
+    G --> H
+    H --> I{Con thiet bi\nchua phan bo?}
+    I -->|Co| D
+    I -->|Khong| J([Ket qua\nLich 24h cho tung thiet bi])
+
+    style A fill:#1e3a5f,stroke:#00d4ff,color:#fff
+    style J fill:#1a3a2a,stroke:#10b981,color:#fff
+    style F fill:#3a1a1a,stroke:#ef4444,color:#fff
+    style G fill:#1a3a2a,stroke:#10b981,color:#fff
+    </div>
+  </div>
+</div>
+
+<a href="/" class="back-btn">← Ve trang chinh</a>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'dark',
+    themeVariables: {
+      background:          '#030d1f',
+      mainBkg:             '#0a1a38',
+      nodeBorder:          '#00d4ff',
+      clusterBkg:          '#050d28',
+      clusterBorder:       '#334155',
+      titleColor:          '#f0f6ff',
+      nodeTextColor:       '#cbd5e1',
+      edgeLabelBackground: '#0a1438',
+      lineColor:           '#00d4ff',
+      primaryColor:        '#0a1a38',
+      primaryTextColor:    '#f0f6ff',
+      primaryBorderColor:  '#00d4ff',
+      secondaryColor:      '#1a0a3d',
+      tertiaryColor:       '#0a2a1a',
+      fontFamily:          'Segoe UI, sans-serif',
+      fontSize:            '13px',
+    },
+    flowchart: { curve: 'basis', padding: 16, nodeSpacing: 40, rankSpacing: 50 }
+  });
+</script>
+</body>
+</html>
