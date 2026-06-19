@@ -10,7 +10,7 @@
     body{background:#030d1f;color:#cbd5e1;font-family:'Segoe UI',sans-serif;min-height:100vh;padding:32px 24px 80px}
     h1{text-align:center;font-size:24px;font-weight:800;margin-bottom:6px;background:linear-gradient(90deg,#00d4ff,#a78bfa,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
     .subtitle{text-align:center;color:#64748b;font-size:13px;margin-bottom:40px}
-    .section{max-width:1000px;margin:0 auto 52px}
+    .section{max-width:960px;margin:0 auto 52px}
     .section-title{font-size:15px;font-weight:700;margin-bottom:14px;padding:9px 16px;border-radius:9px;display:inline-flex;align-items:center;gap:8px}
     .blue  {background:rgba(0,212,255,.1); border:1px solid rgba(0,212,255,.3); color:#00d4ff}
     .purple{background:rgba(124,58,237,.1);border:1px solid rgba(124,58,237,.3);color:#a78bfa}
@@ -32,31 +32,31 @@
   <div class="chart-box">
     <div class="mermaid">
 flowchart TD
-    A([Nguoi dung\nmo trinh duyet]) --> B[Giao dien Web\nindex.html]
-    B --> C{Chon\nchuc nang}
-    C --> D[Dashboard]
-    C --> E[Thiet bi]
-    C --> F[Nhat ky]
-    C --> G[Toi uu DP]
-    C --> H[Lich cao diem]
-    C --> I[Du bao]
-    D --> J[GET /api/stats]
-    E --> K[GET /api/devices]
-    F --> L[POST /api/usage]
-    G --> M[POST /api/optimize]
-    H --> N[POST /api/peak]
-    I --> O[GET /api/forecast]
-    J --> P[(Flask Server\nweb_app.py)]
+    A([Nguoi dung\nmo trinh duyet]) --> B["Giao dien Web\nindex.html"]
+    B --> C{Chon chuc nang}
+    C --> D["Dashboard"]
+    C --> E["Thiet bi"]
+    C --> F["Nhat ky"]
+    C --> G["Toi uu DP"]
+    C --> H["Lich cao diem"]
+    C --> I["Du bao"]
+    D --> J["GET /api/stats"]
+    E --> K["GET /api/devices"]
+    F --> L["POST /api/usage"]
+    G --> M["POST /api/optimize"]
+    H --> N["POST /api/peak"]
+    I --> O["GET /api/forecast"]
+    J --> P[("Flask Server\nweb_app.py")]
     K --> P
     L --> P
     M --> P
     N --> P
     O --> P
-    P --> Q[(File JSON\ndata/)]
+    P --> Q[("File JSON\ndata/")]
     Q --> P
-    P --> R[JSON Response]
-    R --> S[JavaScript xu ly]
-    S --> T[Giao dien cap nhat]
+    P --> R["JSON Response"]
+    R --> S["JavaScript xu ly"]
+    S --> T([Giao dien cap nhat])
 
     style A fill:#1e3a5f,stroke:#00d4ff,color:#fff
     style P fill:#2d1b69,stroke:#7c3aed,color:#fff
@@ -72,40 +72,41 @@ flowchart TD
   <div class="chart-box">
     <div class="mermaid">
 flowchart TD
-    A([Bat dau\ndp_optimize]) --> B["Nhan vao:\ndanh sach thiet bi\nNgan sach W kWh"]
-    B --> C["Tinh so o ngan sach:\nW = int(budget / 0.01) + 1\nVD 2.0kWh → W=201 o"]
-    C --> D["Khoi tao bang DP:\ndp[n+1][W] = 0\nchoice[n][W] = 0"]
-    D --> E["Vong lap ngoai\ni tu 0 den n-1\nduyet tung thiet bi"]
-    E --> F["Sinh lua chon cho thiet bi i\nh = 0.5, 1.0, ..., max_h\ncost_u = kwh / 0.01"]
-    F --> G["Vong lap trong\nj tu 0 den W-1\nduyet tung muc ngan sach"]
-    G --> H["Mac dinh: dp[i+1][j] = dp[i][j]\nkhong dung thiet bi i"]
-    H --> I{Thu tung\nlua chon h gio}
-    I --> J{j >= cost_u?\nDu ngan sach?}
-    J -->|Khong| K[Bo qua\nlua chon nay]
-    J -->|Co| L["candidate = dp[i][j - cost_u] + val\ndiem cu cong diem them"]
-    L --> M{candidate\n> dp[i+1][j]?}
+    A([Bat dau dp_optimize]) --> B["INPUT:\ndanh sach n thiet bi\nngan sach W kWh"]
+    B --> C["Chia ngan sach thanh o:\nso_o = W / 0.01\nVD 2kWh = 200 o"]
+    C --> D["Khoi tao 2 bang:\nbang DP kich thuoc n x so_o\nbang CHOICE de truy vet"]
+    D --> E{Duyet tung\nthiet bi i}
+    E --> F["Sinh cac lua chon:\nh = 0.5h, 1h, ..., max_h\nchi_phi = cong_suat x h / 1000"]
+    F --> G{Duyet tung\nmuc ngan sach j}
+    G --> H["Mac dinh:\nDP_i_j = DP_truoc_i_j\nkhong dung thiet bi i"]
+    H --> I{Thu moi\nlua chon h gio}
+    I --> J{j lon hon\nhoac bang chi_phi?}
+    J -->|Khong du| K[Bo qua\nlua chon nay]
+    J -->|Du| L["diem_thu = DP_truoc_j_tru_chiphi\ncong them diem cua h gio"]
+    L --> M{diem_thu\nlot hon DP hien tai?}
     M -->|Khong| N[Giu nguyen]
-    M -->|Co| O["dp[i+1][j] = candidate\nchoice[i][j] = h\nghi nho quyet dinh"]
-    K --> P{Con lua\nchon nao?}
+    M -->|Co| O["Cap nhat DP_i_j = diem_thu\nCHOICE_i_j = h gio"]
+    K --> P{Con lua chon\nh khac?}
     N --> P
     O --> P
     P -->|Co| I
-    P -->|Het| Q{Con thiet\nbi nao?}
+    P -->|Het| Q{Con thiet\nbi khac?}
     Q -->|Co| E
-    Q -->|Het| R["Tim best_j = argmax dp[n][j]\nlay o cho diem cao nhat"]
-    R --> S["Truy vet nguoc\nj = best_j\ni tu n-1 ve 0"]
-    S --> T{choice[i][j] > 0?}
-    T -->|Co| U["Them vao lich:\nthiet bi i, so gio h\nj -= cost_u"]
-    T -->|Khong| V[Thiet bi i\nkhong duoc dung]
+    Q -->|Het| R["Tim vi tri j cho\ndiem cao nhat trong bang DP"]
+    R --> S["Truy vet nguoc:\nbat dau tu j tot nhat\ndi nguoc i tu n-1 ve 0"]
+    S --> T{CHOICE tai\nvi tri i_j > 0?}
+    T -->|Co| U["Ghi nhan:\nthiet bi i dung h gio\nj = j - chi_phi"]
+    T -->|Khong| V["Thiet bi i\nkhong duoc su dung"]
     U --> W{Con thiet\nbi nao?}
     V --> W
     W -->|Co| S
-    W -->|Het| X([Ket qua\nLich toi uu toan cuc])
+    W -->|Het| X([KET QUA:\nLich su dung toi uu])
 
     style A fill:#1e3a5f,stroke:#00d4ff,color:#fff
     style X fill:#1a3a2a,stroke:#10b981,color:#fff
     style O fill:#2d1b69,stroke:#7c3aed,color:#fff
     style D fill:#1e3a5f,stroke:#00d4ff,color:#fff
+    style R fill:#3a2a0a,stroke:#f59e0b,color:#fff
     </div>
   </div>
 </div>
@@ -116,26 +117,26 @@ flowchart TD
   <div class="chart-box">
     <div class="mermaid">
 flowchart TD
-    A([Bat dau\ngreedy_optimize]) --> B["Nhan vao:\ndanh sach thiet bi\nNgan sach W kWh"]
-    B --> C["Tinh ty le hieu qua\nratio = priority / power_w"]
-    C --> D["Vi du:\nDen LED  15W pri=5 ratio=0.333\nQuat     55W pri=5 ratio=0.091\nDieu hoa 900W pri=4 ratio=0.004"]
-    D --> E["Sap xep giam dan theo ratio\nO(n log n)"]
-    E --> F["remaining = budget_kwh\nlich = rong"]
+    A([Bat dau greedy_optimize]) --> B["INPUT:\ndanh sach n thiet bi\nngan sach W kWh"]
+    B --> C["Tinh ty le hieu qua:\nratio = priority / power_w"]
+    C --> D["Vi du:\nDen LED 15W pri=5 ratio=0.333\nQuat 55W pri=5 ratio=0.091\nDieu hoa 900W pri=4 ratio=0.004"]
+    D --> E["Sap xep giam dan theo ratio\nDo phuc tap O n log n"]
+    E --> F["ngan_sach_con = W kWh\nlich su dung = rong"]
     F --> G{Con thiet bi\nchua xet?}
-    G -->|Khong| END([Ket qua\nLich xap xi])
-    G -->|Co| H[Lay thiet bi tiep theo\ntheo thu tu da sap]
-    H --> I{remaining > 0?}
-    I -->|Khong| END
-    I -->|Co| J["hours_max = remaining / (power_w/1000)\nhours = min(max_daily, hours_max)"]
-    J --> K["Lam tron xuong:\nhours = floor(hours/0.5) x 0.5\ntranh vuot ngan sach"]
-    K --> L{hours >= 0.5h?}
-    L -->|Khong| M[Bo qua\nthiet bi nay]
-    L -->|Co| N["Them vao lich\nremaining -= kwh(hours)"]
+    G -->|Khong| DONE([KET QUA:\nLich xap xi])
+    G -->|Co| H["Lay thiet bi co ratio\ncao nhat chua xet"]
+    H --> I{ngan_sach_con\ncon du?}
+    I -->|Het| DONE
+    I -->|Con| J["Tinh so gio toi da:\ntheo ngan sach con lai\nva gioi han thiet bi"]
+    J --> K["Lam tron xuong 0.5h\nde dam bao\nkhong vuot ngan sach"]
+    K --> L{So gio lon\nhon bang 0.5h?}
+    L -->|Khong| M["Thiet bi nay\nkhong du dieu kien\nbo qua"]
+    L -->|Co| N["Them vao lich\nTru kWh da dung\ntu ngan sach con"]
     M --> G
     N --> G
 
     style A fill:#1e3a5f,stroke:#00d4ff,color:#fff
-    style END fill:#1a3a2a,stroke:#10b981,color:#fff
+    style DONE fill:#1a3a2a,stroke:#10b981,color:#fff
     style E fill:#2d1b69,stroke:#7c3aed,color:#fff
     style D fill:#3a2a0a,stroke:#f59e0b,color:#fff
     </div>
@@ -147,41 +148,30 @@ flowchart TD
   <div class="section-title amber">④ Phan vi du — Tai sao Greedy thua DP</div>
   <div class="chart-box">
     <div class="mermaid">
-flowchart LR
-    subgraph INPUT["Input: Budget = 0.30 kWh"]
-        A["Loa Bluetooth\n200W - priority=3\ncost=0.20kWh\nratio=0.015"]
-        B["Dieu hoa nho\n300W - priority=4\ncost=0.30kWh\nratio=0.013"]
-    end
+flowchart TD
+    INPUT["INPUT: Ngan sach = 0.30 kWh\nLoa Bluetooth 200W priority=3 cost=0.20kWh ratio=0.015\nDieu hoa nho 300W priority=4 cost=0.30kWh ratio=0.013"]
 
-    subgraph GREEDY["Greedy"]
-        direction TB
-        G1["Sap xep: Loa ratio 0.015\ncao hon Dieu hoa 0.013"]
-        G2["Buoc 1: Chon Loa\ndung 0.20kWh - con 0.10kWh\nDat 3 diem"]
-        G3{Dieu hoa can\n0.30kWh\nma chi con 0.10kWh}
-        G4["Bo qua Dieu hoa"]
-        G5["KET QUA: 3 diem"]
-        G1 --> G2 --> G3 -->|Khong du| G4 --> G5
-    end
+    INPUT --> GR["GREEDY\nSap xep: Loa ratio 0.015 cao hon Dieu hoa 0.013"]
+    INPUT --> DP["DP\nXet bang dp kich thuoc 2 x 30"]
 
-    subgraph DP["DP"]
-        direction TB
-        D1["Xet Loa: dp[1][j]"]
-        D2["Xet Dieu hoa: dp[2][30]"]
-        D3["max(3 diem, 0+4 diem) = 4"]
-        D4["Chon Dieu hoa 1h"]
-        D5["KET QUA: 4 diem"]
-        D1 --> D2 --> D3 --> D4 --> D5
-    end
+    GR --> G1["Buoc 1: Chon Loa Bluetooth\nDung 0.20kWh con lai 0.10kWh\nDat duoc 3 diem"]
+    G1 --> G2{Dieu hoa can\n0.30kWh ma chi\ncon 0.10kWh?}
+    G2 -->|Khong du| G3["Bo qua Dieu hoa"]
+    G3 --> G4(["GREEDY: 3 diem\nSAI - khong toi uu"])
 
-    INPUT --> GREEDY
-    INPUT --> DP
-    G5 --> R["DP THANG\n4 diem vs 3 diem\nDP toi uu toan cuc\nGreedy tham lam cuc bo"]
-    D5 --> R
+    DP --> D1["Xet Loa:\nbang dp hang 1"]
+    D1 --> D2["Xet Dieu hoa:\nbang dp hang 2"]
+    D2 --> D3["So sanh tai o thu 30:\nmax 3 diem vs 0 cong 4 diem = 4"]
+    D3 --> D4["Chon Dieu hoa 1 gio"]
+    D4 --> D5(["DP: 4 diem\nDUNG - toi uu toan cuc"])
 
-    style G5 fill:#3a1a1a,stroke:#ef4444,color:#f87171
-    style D5 fill:#1a3a2a,stroke:#10b981,color:#4ade80
-    style R fill:#2d1b69,stroke:#7c3aed,color:#a78bfa
+    G4 --> KL["DP THANG GREEDY\n4 diem lon hon 3 diem\nGreedy tham lam cuc bo\nDP dam bao toi uu toan cuc"]
+    D5 --> KL
+
     style INPUT fill:#1e3a5f,stroke:#00d4ff,color:#cbd5e1
+    style G4 fill:#3a1a1a,stroke:#ef4444,color:#f87171
+    style D5 fill:#1a3a2a,stroke:#10b981,color:#4ade80
+    style KL fill:#2d1b69,stroke:#7c3aed,color:#a78bfa
     </div>
   </div>
 </div>
@@ -193,25 +183,25 @@ flowchart LR
     <div class="mermaid">
 flowchart LR
     subgraph USER["Nguoi dung"]
-        U1[Keo slider\nngan sach]
-        U2[Nhap gio\nsu dung]
-        U3[Xem ket qua\nva bieu do]
+        U1["Keo slider\nngan sach"]
+        U2["Nhap gio\nsu dung"]
+        U3["Xem ket qua\nva bieu do"]
     end
-    subgraph FRONTEND["Frontend JS"]
+    subgraph FE["Frontend JavaScript"]
         F1["api.js\nfetch POST /api/optimize"]
         F2["main.js\nrunOptimize()"]
-        F3["charts.js\nve bieu do"]
+        F3["charts.js\nve bieu do Chart.js"]
     end
-    subgraph BACKEND["Flask Backend"]
+    subgraph BE["Flask Backend Python"]
         B1["web_app.py\nr_optimize()"]
-        B2["dp_optimize()\nO(n x W x H)"]
-        B3["greedy_optimize()\nO(n log n)"]
-        B4["calc_evn()\n6 bac gia"]
+        B2["dp_optimize()\nO n x W x H"]
+        B3["greedy_optimize()\nO n log n"]
+        B4["calc_evn()\n6 bac gia EVN"]
     end
-    subgraph STORAGE["Luu tru"]
-        S1["devices.json"]
-        S2["usage.json"]
-        S3["config.json"]
+    subgraph DB["Luu tru JSON"]
+        S1["devices.json\nthiet bi"]
+        S2["usage.json\nnhat ky"]
+        S3["config.json\ncai dat"]
     end
     U1 --> F2
     U2 --> F1
@@ -229,9 +219,9 @@ flowchart LR
     F3 --> U3
 
     style USER fill:#1e3a5f,stroke:#00d4ff,color:#cbd5e1
-    style FRONTEND fill:#2d1b69,stroke:#7c3aed,color:#cbd5e1
-    style BACKEND fill:#1a3a2a,stroke:#10b981,color:#cbd5e1
-    style STORAGE fill:#3a2a0a,stroke:#f59e0b,color:#cbd5e1
+    style FE fill:#2d1b69,stroke:#7c3aed,color:#cbd5e1
+    style BE fill:#1a3a2a,stroke:#10b981,color:#cbd5e1
+    style DB fill:#3a2a0a,stroke:#f59e0b,color:#cbd5e1
     </div>
   </div>
 </div>
@@ -242,54 +232,56 @@ flowchart LR
   <div class="chart-box">
     <div class="mermaid">
 flowchart TD
-    A([Bat dau\ncalc_evn X kWh]) --> B["cost = 0\nrem = X"]
-    B --> D["Bac 1: min(rem, 50) kWh\nx 1806 dong/kWh"]
-    D --> E{rem > 50?}
-    E -->|Khong| Z
-    E -->|Co| F["Bac 2: min(rem, 50) kWh\nx 1866 dong/kWh"]
-    F --> G{rem > 100?}
-    G -->|Khong| Z
-    G -->|Co| H["Bac 3: min(rem, 100) kWh\nx 2167 dong/kWh"]
-    H --> I{rem > 200?}
-    I -->|Khong| Z
-    I -->|Co| J["Bac 4: min(rem, 100) kWh\nx 2729 dong/kWh"]
-    J --> K{rem > 300?}
-    K -->|Khong| Z
-    K -->|Co| L["Bac 5: min(rem, 100) kWh\nx 3050 dong/kWh"]
-    L --> M{rem > 400?}
-    M -->|Khong| Z
-    M -->|Co| N["Bac 6: phan con lai\nx 3151 dong/kWh"]
-    N --> Z([Tra ve tong tien dong])
+    A([Bat dau calc_evn\nnhap so kWh]) --> B["cost = 0\nrem = so_kWh_nhap_vao"]
+    B --> T1["BAC 1: lay min rem va 50 kWh\nnhan voi 1806 dong moi kWh\ncong vao cost"]
+    T1 --> C1{rem con lai\nhon 50 kWh?}
+    C1 -->|Khong| Z
+    C1 -->|Co| T2["BAC 2: lay min rem va 50 kWh\nnhan voi 1866 dong moi kWh\ncong vao cost"]
+    T2 --> C2{rem con lai\nhon 100 kWh?}
+    C2 -->|Khong| Z
+    C2 -->|Co| T3["BAC 3: lay min rem va 100 kWh\nnhan voi 2167 dong moi kWh\ncong vao cost"]
+    T3 --> C3{rem con lai\nhon 200 kWh?}
+    C3 -->|Khong| Z
+    C3 -->|Co| T4["BAC 4: lay min rem va 100 kWh\nnhan voi 2729 dong moi kWh\ncong vao cost"]
+    T4 --> C4{rem con lai\nhon 300 kWh?}
+    C4 -->|Khong| Z
+    C4 -->|Co| T5["BAC 5: lay min rem va 100 kWh\nnhan voi 3050 dong moi kWh\ncong vao cost"]
+    T5 --> C5{rem con lai\nhon 400 kWh?}
+    C5 -->|Khong| Z
+    C5 -->|Co| T6["BAC 6: phan kWh con lai\nnhan voi 3151 dong moi kWh\ncong vao cost"]
+    T6 --> Z([Tra ve tong so tien])
 
     style A fill:#1e3a5f,stroke:#00d4ff,color:#fff
     style Z fill:#3a2a0a,stroke:#f59e0b,color:#fbbf24
-    style D fill:#1a3a2a,stroke:#10b981,color:#fff
-    style F fill:#1a3a2a,stroke:#10b981,color:#fff
-    style H fill:#3a2a0a,stroke:#f59e0b,color:#fff
-    style J fill:#3a2a0a,stroke:#f59e0b,color:#fff
-    style L fill:#3a1a1a,stroke:#ef4444,color:#fff
-    style N fill:#3a1a1a,stroke:#ef4444,color:#fff
+    style T1 fill:#1a3a2a,stroke:#10b981,color:#fff
+    style T2 fill:#1a3a2a,stroke:#10b981,color:#fff
+    style T3 fill:#3a2a0a,stroke:#f59e0b,color:#fff
+    style T4 fill:#3a2a0a,stroke:#f59e0b,color:#fff
+    style T5 fill:#3a1a1a,stroke:#ef4444,color:#fff
+    style T6 fill:#3a1a1a,stroke:#ef4444,color:#fff
     </div>
   </div>
 </div>
 
-<!-- 7. LICH CAO DIEM -->
+<!-- 7. PEAK -->
 <div class="section">
   <div class="section-title amber">⑦ Heuristic — Phan bo lich tranh gio cao diem</div>
   <div class="chart-box">
     <div class="mermaid">
 flowchart TD
-    A([Bat dau\npeak_aware_schedule]) --> B["Lay ket qua tu DP\ndanh sach thiet bi toi uu"]
-    B --> C["Xac dinh gio thap diem\n= 24 gio tru gio cao diem"]
+    A([Bat dau\npeak_aware_schedule]) --> B["Lay ket qua tu DP\ndanh sach thiet bi da toi uu"]
+    B --> C["Xac dinh gio thap diem\n= 24 gio tru gio cao diem\nVD tru 17h-20h"]
     C --> D{Duyet tung\nthiet bi trong lich}
-    D --> E{power_w >= 500W?\nThiet bi ton dien?}
-    E -->|Co| F["Pool = gio thap diem TRUOC\nVD binh nuoc nong 2000W\nuu tien 0h-16h, 21h-23h"]
-    E -->|Khong| G["Pool = thap diem + cao diem\nVD den LED 15W\nlinh hoat bat ky gio nao"]
-    F --> H["Phan bo hours vao\ncac slot theo pool\nmoi slot toi da 1h"]
+    D --> E{Cong suat\nhon bang 500W?}
+    E -->|Co| F["Uu tien GIO THAP DIEM\nVD binh nuoc nong 2000W\nxep vao 0h-16h hoac 21h-23h"]
+    E -->|Khong| G["Linh hoat ca hai loai gio\nVD den LED 15W\nco the dung bat ky gio"]
+    F --> H["Phan bo tung slot 1 gio\nvao khung gio da chon\ncho den het so gio can dung"]
     G --> H
     H --> I{Con thiet bi\nchua phan bo?}
     I -->|Co| D
-    I -->|Khong| J([Ket qua\nLich 24h cho tung thiet bi])
+    I -->|Khong| J([KET QUA:\nLich 24h cho tung thiet bi])
+    J --> K["Thiet bi 500W tren:\nchay gio thap diem"]
+    J --> L["Thiet bi duoi 500W:\nco the chay gio cao diem"]
 
     style A fill:#1e3a5f,stroke:#00d4ff,color:#fff
     style J fill:#1a3a2a,stroke:#10b981,color:#fff
@@ -314,14 +306,14 @@ flowchart TD
       titleColor:          '#f0f6ff',
       nodeTextColor:       '#cbd5e1',
       edgeLabelBackground: '#0a1438',
-      lineColor:           '#00d4ff',
+      lineColor:           '#64748b',
       primaryColor:        '#0a1a38',
       primaryTextColor:    '#f0f6ff',
       primaryBorderColor:  '#00d4ff',
       secondaryColor:      '#1a0a3d',
       tertiaryColor:       '#0a2a1a',
       fontFamily:          'Segoe UI, sans-serif',
-      fontSize:            '13px',
+      fontSize:            '13px'
     },
     flowchart: { curve: 'basis', padding: 16, nodeSpacing: 40, rankSpacing: 50 }
   });
